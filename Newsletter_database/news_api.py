@@ -1,6 +1,11 @@
 import json
 import mysql.connector
 from mysql.connector import Error
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+import os
+
 
 class NewsAPI:
     def __init__(self):
@@ -79,9 +84,9 @@ class NewsAPI:
             cursor.close()
 
     def get_articles_by_category(self, category):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(dictionary=True)
         query = """
-        SELECT a.id, a.title, s.summary 
+        SELECT a.id, a.title, a.link, s.summary 
         FROM articles a
         JOIN summaries s ON a.id = s.article_id
         WHERE s.category = %s 
@@ -203,6 +208,30 @@ class NewsAPI:
             return False
         finally:
             cursor.close()
+
+    def generate_pdf_by_category(self, category):
+        articles = self.get_articles_by_category(category)
+        if not articles:
+            print(f"No articles found for category {category}")
+            return None
+
+        pdf_filename = os.path.join(os.getcwd(), f"{category}_newsletter.pdf")
+        doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
+        styles = getSampleStyleSheet()
+        story = []
+
+        story.append(Paragraph(f"Newsletter: {category}", styles['Title']))
+        story.append(Spacer(1, 12))
+
+        for article in articles:
+            story.append(Paragraph(article['title'], styles['Heading2']))
+            story.append(Paragraph(article['summary'], styles['BodyText']))
+            story.append(Paragraph(f"Link: {article['link']}", styles['BodyText']))
+            story.append(Spacer(1, 12))
+
+        doc.build(story)
+        print(f"PDF generated: {pdf_filename}")
+        return pdf_filename
 
     def close(self):
         if self.connection.is_connected():
