@@ -6,6 +6,7 @@ from Newsletter_database.news_api import NewsAPI
 class ArticleFinder:
     def __init__(self):
         self.news_api = NewsAPI()
+        # Lista źródeł RSS do przeszukiwania
         self.rss_feeds = [
             'http://feeds.bbci.co.uk/news/technology/rss.xml',
             'http://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
@@ -23,6 +24,7 @@ class ArticleFinder:
             'https://www.sciencedaily.com/rss/computers_math.xml',
             'https://www.nature.com/subjects/computer-science.rss'
         ]
+        # Lista stron internetowych do scrapowania
         self.websites = [
             'https://techcrunch.com',
             'https://www.theverge.com',
@@ -42,12 +44,14 @@ class ArticleFinder:
         ]
 
     def find_new_articles(self):
+        """Główna metoda do znajdowania nowych artykułów"""
         articles = []
         articles.extend(self._parse_rss_feeds())
         articles.extend(self._scrape_websites())
         return self._filter_new_articles(articles)
 
     def _parse_rss_feeds(self):
+        """Metoda do parsowania kanałów RSS"""
         articles = []
         for feed_url in self.rss_feeds:
             feed = feedparser.parse(feed_url)
@@ -60,6 +64,7 @@ class ArticleFinder:
         return articles
 
     def _scrape_websites(self):
+        """Metoda do scrapowania stron internetowych"""
         articles = []
         for website in self.websites:
             response = requests.get(website)
@@ -77,6 +82,7 @@ class ArticleFinder:
         return articles
 
     def _filter_new_articles(self, articles):
+        """Metoda do filtrowania nowych artykułów"""
         new_articles = []
         for article in articles:
             if not self.news_api.article_exists(article['link']):

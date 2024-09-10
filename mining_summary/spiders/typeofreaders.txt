@@ -89,3 +89,22 @@ Charakterystyczne cechy i tematy:
 - Czujniki kwantowe i ich zastosowania w medycynie i nawigacji
 - Komunikacja kwantowa i internet kwantowy
 - Wpływ technologii kwantowych na przyszłość obliczeń i przetwarzania danych
+
+
+(AI)
+Oryginalny artykuł:
+"DeepMind's latest AI model, AlphaFold 2, has made a significant breakthrough in the field of protein folding. The system can predict protein structures with near-atomic accuracy, even for proteins that have stumped scientists for years. This advancement could revolutionize drug discovery and our understanding of diseases. The AI uses deep learning techniques to analyze vast amounts of genomic data and predict how proteins will fold based on their amino acid sequences. While there are still challenges to overcome, such as predicting how proteins interact with each other, this development marks a major step forward in applying AI to complex biological problems."
+Streszczenie:
+AI: DeepMind's AlphaFold 2 AI model has achieved a breakthrough in predicting protein structures with near-atomic accuracy, potentially revolutionizing drug discovery and disease understanding. The system uses deep learning to analyze genomic data and predict protein folding based on amino acid sequences. While challenges remain, such as predicting protein interactions, this advancement demonstrates AI's significant potential in solving complex biological problems.
+
+(IoT)
+Oryginalny artykuł:
+"Smart agriculture is taking a leap forward with the introduction of a new IoT-based irrigation system. This system uses a network of sensors to monitor soil moisture, temperature, and weather conditions in real-time. The data is then processed using cloud-based analytics to determine optimal watering schedules for different areas of a farm. Farmers can access this information and control irrigation through a mobile app. Early trials have shown water savings of up to 30% while maintaining or even improving crop yields. The system also integrates with weather forecasts to adjust irrigation plans accordingly. As climate change makes water management increasingly critical, such IoT solutions could play a vital role in sustainable agriculture."
+Streszczenie:
+IoT: A new IoT-based irrigation system for smart agriculture uses sensors to monitor soil and weather conditions in real-time. Cloud-based analytics process the data to determine optimal watering schedules, which farmers can access and control via a mobile app. The system has demonstrated water savings of up to 30% while maintaining or improving crop yields, and integrates with weather forecasts for adaptive planning. This IoT solution shows significant potential for sustainable agriculture in the face of climate change challenges.
+
+(CS)
+Oryginalny artykuł:
+"A new form of ransomware attack has been discovered that targets industrial control systems (ICS). Unlike traditional ransomware that encrypts data, this malware manipulates the settings of critical infrastructure systems, potentially causing physical damage or disruption. The attack vector appears to exploit vulnerabilities in outdated SCADA systems. Cybersecurity experts warn that this represents a dangerous escalation in the capabilities of cybercriminals and potentially state-sponsored actors. The discovery has prompted calls for urgent upgrades to industrial cybersecurity measures and increased collaboration between the public and private sectors. Experts are also advocating for the development of AI-powered threat detection systems specifically designed for ICS environments."
+Streszczenie:
+CS: A new ransomware variant targeting industrial control systems (ICS) has been discovered, capable of manipulating critical infrastructure settings rather than just encrypting data. The malware exploits vulnerabilities in outdated SCADA systems, representing a dangerous escalation in cyber threats. This development has led to calls for urgent industrial cybersecurity upgrades, increased public-private collaboration, and the development of AI-powered threat detection systems specifically for ICS environments.

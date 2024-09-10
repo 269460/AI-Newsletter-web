@@ -1,9 +1,13 @@
 CREATE DATABASE IF NOT EXISTS newsletter;
 USE newsletter;
-CREATE TABLE IF NOT EXISTS article(
+
+CREATE TABLE IF NOT EXISTS article (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    link VARCHAR(2083),
-    scrapy_text MEDIUMTEXT
+    link VARCHAR(2083) UNIQUE,
+    title VARCHAR(255),
+    scrapy_text MEDIUMTEXT,
+    source VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS summaries (
@@ -12,7 +16,7 @@ CREATE TABLE IF NOT EXISTS summaries (
     summary TEXT,
     category VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+    FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
     INDEX (category)
 );
 
@@ -41,6 +45,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 
 -- Dodanie indeksów dla poprawy wydajności
-CREATE INDEX idx_article_link ON articles(link);
+CREATE INDEX idx_article_link ON article(link);
 CREATE INDEX idx_summary_article_id ON summaries(article_id);
 CREATE INDEX idx_user_email ON users(email);

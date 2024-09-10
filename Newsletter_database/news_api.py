@@ -29,7 +29,7 @@ class NewsAPI:
 
     def save_article(self, link, title, scrapy_text, source):
         cursor = self.connection.cursor()
-        query = """INSERT INTO articles (link, title, scrapy_text, source) 
+        query = """INSERT INTO article (link, title, scrapy_text, source) 
                    VALUES (%s, %s, %s, %s)"""
         values = (link, title, scrapy_text, source)
         try:
@@ -83,20 +83,47 @@ class NewsAPI:
         finally:
             cursor.close()
 
-    def get_articles_by_category(self, category):
+    def get_user(self, user_id):
         cursor = self.connection.cursor(dictionary=True)
-        query = """
-        SELECT a.id, a.title, a.link, s.summary 
-        FROM articles a
+        query = "SELECT * FROM users WHERE id = %s"
+        try:
+            cursor.execute(query, (user_id,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Error fetching user with id {user_id}: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def get_articles_by_categories(self, categories, limit=5):
+        cursor = self.connection.cursor(dictionary=True)
+        placeholders = ', '.join(['%s'] * len(categories))
+        query = f"""
+        SELECT a.*, s.summary, s.category
+        FROM article a
         JOIN summaries s ON a.id = s.article_id
-        WHERE s.category = %s 
-        ORDER BY a.id DESC LIMIT 10
+        WHERE s.category IN ({placeholders})
+        ORDER BY a.created_at DESC
+        LIMIT %s
         """
         try:
-            cursor.execute(query, (category,))
+            cursor.execute(query, (*categories, limit))
             return cursor.fetchall()
         except Error as e:
-            print(f"Error fetching articles for category {category}: {e}")
+            print(f"Error fetching articles for categories {categories}: {e}")
+            return []
+        finally:
+            cursor.close()
+
+
+    def get_all_users(self):
+        cursor = self.connection.cursor(dictionary=True)
+        query = "SELECT * FROM users"
+        try:
+            cursor.execute(query)
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Error fetching all users: {e}")
             return []
         finally:
             cursor.close()
@@ -104,11 +131,11 @@ class NewsAPI:
     def get_article(self, article_id):
         cursor = self.connection.cursor()
         query = """
-        SELECT a.*, s.summary, s.category
-        FROM articles a
-        LEFT JOIN summaries s ON a.id = s.article_id
-        WHERE a.id = %s
-        """
+           SELECT a.*, s.summary, s.category
+           FROM article a
+           LEFT JOIN summaries s ON a.id = s.article_id
+           WHERE a.id = %s
+           """
         try:
             cursor.execute(query, (article_id,))
             return cursor.fetchone()
@@ -146,7 +173,7 @@ class NewsAPI:
 
     def update_article(self, article_id, title=None, scrapy_text=None, source=None):
         cursor = self.connection.cursor()
-        query = "UPDATE articles SET "
+        query = "UPDATE article SET "
         values = []
         if title:
             query += "title = %s, "
@@ -198,7 +225,7 @@ class NewsAPI:
 
     def article_exists(self, link):
         cursor = self.connection.cursor()
-        query = "SELECT id FROM articles WHERE link = %s"
+        query = "SELECT id FROM article WHERE link = %s"
         try:
             cursor.execute(query, (link,))
             result = cursor.fetchone()
@@ -232,6 +259,34 @@ class NewsAPI:
         doc.build(story)
         print(f"PDF generated: {pdf_filename}")
         return pdf_filename
+
+    def search_articles(self, query):
+        cursor = self.connection.cursor(dictionary=True)
+        search_query = f"%{query}%"
+        sql = """
+        SELECT a.*, s.summary, s.category
+        FROM article a
+        LEFT JOIN summaries s ON a.id = s.article_id
+        WHERE a.title LIKE %s OR a.scrapy_text LIKE %s
+        """
+        cursor.execute(sql, (search_query, search_query))
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+
+    def get_article_count(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM article")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        return count
+
+    def get_new_article_count(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM article WHERE DATE(created_at) = CURDATE()")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        return count
 
     def close(self):
         if self.connection.is_connected():

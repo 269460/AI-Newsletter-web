@@ -269,13 +269,12 @@ class MiningSpider(scrapy.Spider):
             yield scrapy.Request(article['link'], self.parse, meta={'source': article['source']})
 
     def parse(self, response):
-        # Parsowanie odpowiedzi i przetwarzanie artykułu
+        """Przetwarza odpowiedź i zapisuje artykuł do bazy danych"""
         content = self.extract_content(response)
         if not content:
             self.logger.error(f"Nie udało się wyekstrahować treści z: {response.url}")
             return
 
-        # Czyszczenie i przetwarzanie treści
         cleaned_content = clean_text(content)
         summary = generate_summary(self.summary_instructions + "\n\n" + cleaned_content)
         category = self.categorize_tech_article(cleaned_content)
@@ -285,16 +284,12 @@ class MiningSpider(scrapy.Spider):
                 article_id = self.news_api.save_article(
                     link=response.url,
                     title=response.css('title::text').get(),
-                    scrapy_text=cleaned_content,
+                    content=cleaned_content,
+                    summary=summary,
+                    category=category,
                     source=response.meta['source']
                 )
-
                 if article_id:
-                    self.news_api.save_summary(
-                        article_id=article_id,
-                        summary=summary,
-                        category=category
-                    )
                     self.logger.info(f"Artykuł i streszczenie zapisane: {response.url}")
                 else:
                     self.logger.error(f"Nie udało się zapisać artykułu: {response.url}")
@@ -302,8 +297,6 @@ class MiningSpider(scrapy.Spider):
                 self.logger.info(f"Artykuł już istnieje: {response.url}")
         except Exception as e:
             self.logger.error(f"Błąd podczas przetwarzania artykułu {response.url}: {str(e)}")
-
-        self.save_summary_to_file(response.url, summary)
 
     def categorize_tech_article(self, content):
         categories = {
@@ -326,18 +319,6 @@ class MiningSpider(scrapy.Spider):
 
         return 'OT'  # Other Technology, jeśli nie pasuje do żadnej konkretnej kategorii
 
-    def save_summary_to_file(self, url, summary):
-        directory = "summaries"
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        filename = f"{directory}/{url.split('/')[-1]}_summary.txt"
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(summary)
-            self.logger.info(f"Streszczenie zapisane do pliku: {filename}")
-        except Exception as e:
-            self.logger.error(f"Błąd podczas zapisywania streszczenia do pliku {filename}: {str(e)}")
 
     def extract_content(self, response):
         # Ekstrakcja treści z różnych źródeł
