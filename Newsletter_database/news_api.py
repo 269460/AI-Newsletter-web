@@ -233,6 +233,41 @@ class NewsAPI:
         print(f"PDF generated: {pdf_filename}")
         return pdf_filename
 
+    def search_articles(self, query):
+        cursor = self.connection.cursor(dictionary=True)
+        search_query = f"%{query}%"
+        sql = """
+        SELECT a.*, s.summary, s.category
+        FROM articles a
+        LEFT JOIN summaries s ON a.id = s.article_id
+        WHERE a.title LIKE %s OR a.scrapy_text LIKE %s
+        """
+        cursor.execute(sql, (search_query, search_query))
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+
+    def get_article_count(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM articles")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        return count
+
+    def get_new_article_count(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(*) FROM articles WHERE DATE(created_at) = CURDATE()")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        return count
+
+    def get_popular_articles(self, limit=5):
+        cursor = self.connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM articles ORDER BY views DESC LIMIT %s", (limit,))
+        articles = cursor.fetchall()
+        cursor.close()
+        return articles
+
     def close(self):
         if self.connection.is_connected():
             self.connection.close()

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">{{ article.title }}</h1>
+<p class="lead">Category: {{ article.category }}</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Summary</h5>
+        <p class="card-text">{{ article.summary }}</p>
+    </div>
+</div>
+
+<h2>Full Article</h2>
+<p>{{ article.content }}</p>
+
+<a href="{{ article.link }}" class="btn btn-primary mt-3" target="_blank">Read Original Article</a>
+{% endblock %}

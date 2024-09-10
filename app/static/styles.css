@@ -1,47 +1,116 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --accent-color: #17a2b8;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
-.container {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
 }
 
-h1, h2 {
-    text-align: center;
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 
-.form-group {
-    margin-bottom: 15px;
+main {
+    min-height: calc(100vh - 160px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
 }
 
 .btn-primary {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: darken(var(--primary-color), 10%);
+    border-color: darken(var(--primary-color), 10%);
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 
-li {
-    background-color: #e9ecef;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
+.btn-secondary:hover {
+    background-color: darken(var(--secondary-color), 10%);
+    border-color: darken(var(--secondary-color), 10%);
+}
+
+.alert {
+    border-radius: 0;
+    border: none;
+    color: white;
+}
+
+.alert-success {
+    background-color: #28a745;
+}
+
+.alert-danger {
+    background-color: #dc3545;
+}
+
+.alert-info {
+    background-color: var(--accent-color);
+}
+
+footer {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Specific page styles */
+
+/* Home page */
+.category-card {
+    height: 100%;
+}
+
+/* Article page */
+.article-content {
+    line-height: 1.8;
+}
+
+/* Profile page */
+.form-select[multiple] {
+    height: auto;
+    min-height: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
 }
