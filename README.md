@@ -1,14 +1,5 @@
 # AI-Newsletter
 
-Link do dysku
-https://drive.google.com/drive/folders/1kHE6cqm0UfLt_6vmeW38WpI3Ti0xMAyH?usp=drive_link
-
-Link do worda z technologiami 
-https://docs.google.com/document/d/1dSyqrSKMrovZlTcpcRdO3RtwqI05NWoOLoD6JRjSgeQ/edit?usp=sharing
-
-AI Newsletter technology 
-https://docs.google.com/document/d/1lUMj5UCiYIsdB6NbZVIpWXN-ROYB013KqvdvYAjirEc/edit?usp=sharing
-
 Ogolna idea
 
 1. Rejestracja i logowanie:
@@ -77,4 +68,3 @@ Implementacja:
 4. System wysyłki e-maili:
    - Używamy biblioteki do wysyłania e-maili (np. Flask-Mail) do dystrybucji newsletterów.
 
-Czy ta koncepcja odpowiada Twoim oczekiwaniom? Czy chciałabyś coś dodać lub zmodyfikować w tym planie?

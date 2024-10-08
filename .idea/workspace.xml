@@ -5,30 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34225747-cb18-45f5-b37e-e2fc74e37020" name="Changes" comment="typeofreaders.txt">
-      <change afterPath="$PROJECT_DIR$/email_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/newsletter_sender.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_database.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_pdf_generation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_scraper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_server.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/admin/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/admin/routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/auth/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/auth/routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/main/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/main/routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Newsletter_database/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Newsletter_database/init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Newsletter_database/news_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/Newsletter_database/news_api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/email_sender.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/email_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/email_sender.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/automate.py" beforeDir="false" afterPath="$PROJECT_DIR$/automate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/article_finder.py" beforeDir="false" afterPath="$PROJECT_DIR$/mining_summary/spiders/article_finder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/generatePDF.py" beforeDir="false" afterPath="$PROJECT_DIR$/mining_summary/spiders/generatePDF.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/import scrapy.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/mining_summary.py" beforeDir="false" afterPath="$PROJECT_DIR$/mining_summary/spiders/mining_summary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/mining_summary/spiders/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mining_summary/spiders/typeofreaders.txt" beforeDir="false" afterPath="$PROJECT_DIR$/mining_summary/spiders/typeofreaders.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/text_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/email_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/newsletter_sender.py" beforeDir="false" afterPath="$PROJECT_DIR$/newsletter_sender.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,8 +162,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-PY-242.20224.428" />
-        <option value="bundled-python-sdk-80e8e15d2b92-39cff9de6eef-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.20224.428" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.22855.92" />
+        <option value="bundled-python-sdk-b068d85d1acf-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.22855.92" />
       </set>
     </attachedChunks>
   </component>
@@ -188,6 +179,10 @@
       <workItem from="1726663556197" duration="599000" />
       <workItem from="1726739023606" duration="14479000" />
       <workItem from="1726844312312" duration="393000" />
+      <workItem from="1727195613992" duration="4046000" />
+      <workItem from="1727543398627" duration="13647000" />
+      <workItem from="1728280496468" duration="773000" />
+      <workItem from="1728413391176" duration="5567000" />
     </task>
     <task id="LOCAL-00001" summary="plik">
       <option name="closed" value="true" />
