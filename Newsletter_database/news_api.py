@@ -27,11 +27,10 @@ class NewsAPI:
             print(f"Error connecting to MySQL database: {e}")
             return None
 
-    def save_article(self, link, title, scrapy_text, source):
-        cursor = self.connection.cursor()
-        query = """INSERT INTO article (link, title, scrapy_text, source) 
-                   VALUES (%s, %s, %s, %s)"""
-        values = (link, title, scrapy_text, source)
+    def save_article(self, link, title, scrapy_text, source, category_id):
+        query = """INSERT INTO article (link, title, scrapy_text, source, category_id) 
+                   VALUES (%s, %s, %s, %s, %s)"""
+        values = (link, title, scrapy_text, source, category_id)
         try:
             cursor.execute(query, values)
             self.connection.commit()
@@ -43,11 +42,10 @@ class NewsAPI:
         finally:
             cursor.close()
 
-    def save_summary(self, article_id, summary, category):
-        cursor = self.connection.cursor()
-        query = """INSERT INTO summaries (article_id, summary, category) 
-                   VALUES (%s, %s, %s)"""
-        values = (article_id, summary, category)
+    def save_summary(self, article_id, summary):
+        query = """INSERT INTO summaries (article_id, summary) 
+                   VALUES (%s, %s)"""
+        values = (article_id, summary)
         try:
             cursor.execute(query, values)
             self.connection.commit()
@@ -96,13 +94,13 @@ class NewsAPI:
             cursor.close()
 
     def get_articles_by_categories(self, categories, limit=5):
-        cursor = self.connection.cursor(dictionary=True)
         placeholders = ', '.join(['%s'] * len(categories))
         query = f"""
-        SELECT a.*, s.summary, s.category
+        SELECT a.*, s.summary, c.name as category
         FROM article a
         JOIN summaries s ON a.id = s.article_id
-        WHERE s.category IN ({placeholders})
+        JOIN categories c ON a.category_id = c.id
+        WHERE c.name IN ({placeholders})
         ORDER BY a.created_at DESC
         LIMIT %s
         """
@@ -129,13 +127,14 @@ class NewsAPI:
             cursor.close()
 
     def get_article(self, article_id):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(dictionary=True)
         query = """
-           SELECT a.*, s.summary, s.category
-           FROM article a
-           LEFT JOIN summaries s ON a.id = s.article_id
-           WHERE a.id = %s
-           """
+        SELECT a.*, s.summary, c.name as category_name
+        FROM article a
+        LEFT JOIN summaries s ON a.id = s.article_id
+        LEFT JOIN categories c ON a.category_id = c.id
+        WHERE a.id = %s
+        """
         try:
             cursor.execute(query, (article_id,))
             return cursor.fetchone()
@@ -146,10 +145,10 @@ class NewsAPI:
             cursor.close()
 
     def save_user(self, email, password, preferences):
-        cursor = self.connection.cursor()
-        query = """INSERT INTO users (email, password, preferences) 
+        query = """INSERT INTO users (email, password_hash, preferences) 
                    VALUES (%s, %s, %s)"""
-        values = (email, password, preferences)
+        hashed_password = generate_password_hash(password)
+        values = (email, hashed_password, json.dumps(preferences))
         try:
             cursor.execute(query, values)
             self.connection.commit()
@@ -171,7 +170,7 @@ class NewsAPI:
         finally:
             cursor.close()
 
-    def update_article(self, article_id, title=None, scrapy_text=None, source=None):
+    def update_article(self, article_id, title=None, scrapy_text=None, source=None, category_id=None):
         cursor = self.connection.cursor()
         query = "UPDATE article SET "
         values = []
@@ -184,6 +183,9 @@ class NewsAPI:
         if source:
             query += "source = %s, "
             values.append(source)
+        if category_id:
+            query += "category_id = %s, "
+            values.append(category_id)
         query = query.rstrip(', ') + " WHERE id = %s"
         values.append(article_id)
 
@@ -264,9 +266,10 @@ class NewsAPI:
         cursor = self.connection.cursor(dictionary=True)
         search_query = f"%{query}%"
         sql = """
-        SELECT a.*, s.summary, s.category
+        SELECT a.*, s.summary, c.name as category_name
         FROM article a
         LEFT JOIN summaries s ON a.id = s.article_id
+        LEFT JOIN categories c ON a.category_id = c.id
         WHERE a.title LIKE %s OR a.scrapy_text LIKE %s
         """
         cursor.execute(sql, (search_query, search_query))

@@ -17,7 +17,7 @@ def register():
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', title='Register', form=form)
+    return render_template('register.html', title='Register', form=form)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -31,9 +31,9 @@ def login():
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('main.index'))
-    return render_template('auth/login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Login', form=form)
 
 @bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('auth.login'))

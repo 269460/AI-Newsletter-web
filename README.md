@@ -68,3 +68,40 @@ Implementacja:
 4. System wysyłki e-maili:
    - Używamy biblioteki do wysyłania e-maili (np. Flask-Mail) do dystrybucji newsletterów.
 
+
+działania bazy danych 
+
+Kategorie (Categories):
+
+Każda kategoria ma unikalną nazwę i opis.
+Kategorie są teraz bezpośrednio powiązane z artykułami.
+
+
+Artykuły (Article):
+
+Każdy artykuł jest przypisany do jednej kategorii poprzez category_id.
+Artykuły mają link, tytuł, treść, źródło i datę utworzenia.
+Każdy artykuł może mieć jedno powiązane podsumowanie.
+
+
+Podsumowania (Summary):
+
+Każde podsumowanie jest powiązane z jednym artykułem.
+Zawiera tylko tekst podsumowania, bez osobnej kategorii.
+
+
+Użytkownicy (User):
+
+Przechowują email, zahaszowane hasło i preferencje (jako JSON).
+Nie ma już pola is_admin.
+
+
+Subskrypcje (Subscription):
+
+Łączą użytkowników z kategoriami, określając częstotliwość otrzymywania newslettera.
+
+
+
+Główne zmiany i ich wpływ:
+
+Kategoria jest teraz bezpośrednio powiązana z artykułem, co upraszcza zapytania i strukturę danych.
