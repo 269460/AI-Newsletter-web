@@ -8,6 +8,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     preferences = db.Column(db.JSON)
+    is_subscribed = db.Column(db.Boolean, default=False)
+
+    def subscribe(self):
+        self.is_subscribed = True
+
+    def unsubscribe(self):
+        self.is_subscribed = False
 
     def get_preferences(self):
         return self.preferences if self.preferences else []

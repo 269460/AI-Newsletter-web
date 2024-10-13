@@ -1,4 +1,4 @@
-#tu trzeba bedzie przez azure functions
+
 from mining_summary.spiders.mining_summary import run_spider
 from Newsletter_database.news_api import NewsAPI
 from newsletter_sender import NewsletterSender

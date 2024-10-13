@@ -1,18 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="mb-4">{{ article.title }}</h1>
-<p class="lead">Category: {{ article.category }}</p>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Summary</h5>
-        <p class="card-text">{{ article.summary }}</p>
+{% if articles %}
+    <h1 class="mb-4">Latest Articles</h1>
+    <div class="article-list">
+        {% for article in articles %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">{{ article.title }}</h2>
+                <p class="card-text">Category: {{ article.category.name }}</p>
+                <p class="card-text">Source: {{ article.source }}</p>
+                <p class="card-text">Created at: {{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <a href="{{ url_for('main.article', id=article.id) }}" class="btn btn-primary">View Details</a>
+                <a href="{{ article.link }}" class="btn btn-secondary" target="_blank">Read Original Article</a>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-</div>
+{% else %}
+    <h1 class="mb-4">{{ article.title }}</h1>
+    <p class="lead">Category: {{ article.category.name }}</p>
 
-<h2>Full Article</h2>
-<p>{{ article.content }}</p>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Summary</h5>
+            <p class="card-text">{{ article.summary.summary }}</p>
+        </div>
+    </div>
 
-<a href="{{ article.link }}" class="btn btn-primary mt-3" target="_blank">Read Original Article</a>
+    <h2>Full Article</h2>
+    <p>{{ article.scrapy_text }}</p>
+
+    <a href="{{ article.link }}" class="btn btn-primary mt-3" target="_blank">Read Original Article</a>
+{% endif %}
 {% endblock %}

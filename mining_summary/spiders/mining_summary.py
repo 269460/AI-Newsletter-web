@@ -284,10 +284,9 @@ class MiningSpider(scrapy.Spider):
                 article_id = self.news_api.save_article(
                     link=response.url,
                     title=response.css('title::text').get(),
-                    content=cleaned_content,
-                    summary=summary,
-                    category=category,
-                    source=response.meta['source']
+                    scrapy_text=cleaned_content,
+                    source=response.meta['source'],
+                    category=category
                 )
                 if article_id:
                     self.logger.info(f"Artykuł i streszczenie zapisane: {response.url}")

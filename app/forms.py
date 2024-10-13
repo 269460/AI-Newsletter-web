@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectMultipleField
+from wtforms.fields.simple import BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo
-from app.models import User
+from app.models import User, Category
 from wtforms.validators import ValidationError
 
 class LoginForm(FlaskForm):
@@ -20,17 +21,28 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
+
 class UpdatePreferencesForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super(UpdatePreferencesForm, self).__init__(*args, **kwargs)
+        self.preferences.choices = [(c.name, c.name) for c in Category.query.all()]
+
+    preferences = SelectMultipleField('Categories')
+    submit = SubmitField('Update Preferences')
+
+class SubscriptionForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
     preferences = SelectMultipleField('Categories', choices=[
         ('AI', 'Artificial Intelligence'),
         ('IoT', 'Internet of Things'),
-        ('CS', 'Cybersecurity'),
-        ('RA', 'Robotics and Automation'),
-        ('TC', 'Cloud Technologies'),
-        ('TM', 'Mobile Technologies'),
-        ('BT', 'Biotechnology'),
-        ('NT', 'Nanotechnology'),
-        ('EO', 'Renewable Energy'),
-        ('TK', 'Quantum Technologies')
+        'CS': ['cyberbezpieczeństwo', 'bezpieczeństwo cyfrowe', 'hacking', 'ochrona danych', 'kryptografia'],
+    'RA': ['robotyka', 'automatyzacja', 'robot', 'coboty', 'RPA'],
+    'TC': ['chmura', 'cloud computing', 'edge computing', 'fog computing', 'centrum danych'],
+    'TM': ['5G', '6G', 'smartfon', 'aplikacje mobilne', 'technologie mobilne'],
+    'BT': ['biotechnologia', 'inżynieria genetyczna', 'CRISPR', 'terapia genowa', 'bioczujniki'],
+    'NT': ['nanotechnologia', 'nanomateriały', 'nanoroboty', 'nanostruktury'],
+    'EO': ['energia odnawialna', 'fotowoltaika', 'energia wiatrowa', 'magazynowanie energii'],
+    'TK': ['komputer kwantowy', 'kryptografia kwantowa', 'czujniki kwantowe', 'internet kwantowy']
+
     ])
-    submit = SubmitField('Update Preferences')
+    submit = SubmitField('Subscribe to Newsletter')

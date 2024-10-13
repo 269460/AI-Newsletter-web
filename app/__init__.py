@@ -12,7 +12,6 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-mail = Mail()
 csrf = CSRFProtect()
 
 def create_app():

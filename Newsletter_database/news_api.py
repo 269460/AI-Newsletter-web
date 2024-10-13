@@ -1,10 +1,14 @@
 import json
+from functools import wraps
+
 import mysql.connector
 from mysql.connector import Error
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 import os
+
+from sqlalchemy.engine import cursor
 
 
 class NewsAPI:
@@ -27,10 +31,11 @@ class NewsAPI:
             print(f"Error connecting to MySQL database: {e}")
             return None
 
-    def save_article(self, link, title, scrapy_text, source, category_id):
+    def save_article(self, link, title, scrapy_text, source, category):
+        cursor = self.connection.cursor()
         query = """INSERT INTO article (link, title, scrapy_text, source, category_id) 
-                   VALUES (%s, %s, %s, %s, %s)"""
-        values = (link, title, scrapy_text, source, category_id)
+                   VALUES (%s, %s, %s, %s, (SELECT id FROM categories WHERE name = %s))"""
+        values = (link, title, scrapy_text, source, category)
         try:
             cursor.execute(query, values)
             self.connection.commit()
@@ -296,3 +301,16 @@ class NewsAPI:
             self.connection.close()
             print("MySQL connection closed")
 
+class NewsAPIError(Exception):
+    pass
+
+def handle_error(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except mysql.connector.Error as e:
+            raise NewsAPIError(f"Database error: {str(e)}")
+        except Exception as e:
+            raise NewsAPIError(f"Unexpected error: {str(e)}")
+    return wrapper

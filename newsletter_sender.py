@@ -10,7 +10,7 @@ class NewsletterSender:
 
     def prepare_newsletter(self, user_id):
         user = User.query.get(user_id)
-        if not user:
+        if not user or not user.is_subscribed:
             print(f"User with id {user_id} not found")
             return None
 
@@ -46,21 +46,28 @@ class NewsletterSender:
             'pdf_paths': pdf_paths
         }
 
+    # def send_newsletters(self):
+    #     users = User.query.all()
+    #     for user in users:
+    #         content = self.prepare_newsletter(user.id)
+    #         if content:
+    #             if isinstance(self.send_email, send_newsletter_flask):
+    #                 self.send_email(user, content['context']['articles'])
+    #             else:
+    #                 self.send_email(
+    #                     to_email=user.email,
+    #                     subject="Your technology newsletter",
+    #                     template='email/newsletter',
+    #                     template_context=content['context'],
+    #                     attachments=content['pdf_paths']
+    #                 )
+
     def send_newsletters(self):
-        users = User.query.all()
-        for user in users:
+        subscribed_users = User.query.filter_by(is_subscribed=True).all()
+        for user in subscribed_users:
             content = self.prepare_newsletter(user.id)
             if content:
-                if isinstance(self.send_email, send_newsletter_flask):
-                    self.send_email(user, content['context']['articles'])
-                else:
-                    self.send_email(
-                        to_email=user.email,
-                        subject="Your technology newsletter",
-                        template='email/newsletter',
-                        template_context=content['context'],
-                        attachments=content['pdf_paths']
-                    )
+                send_newsletter(content['user'], content['articles'], content['pdf_paths'])
 
 if __name__ == "__main__":
     sender = NewsletterSender()
