@@ -8,14 +8,14 @@ Ogolna idea
      - Adres e-mail
      - Hasło
      - Preferowane kategorie technologiczne (wybór wielokrotny)
-     - Preferowaną częstotliwość otrzymywania newslettera (codziennie, co tydzień, co miesiąc)
-
+     - Subskrypcja dla uzytkownikow, ktore wola otrzymywac newsletter mailem 
+    
 2. Strona główna (po zalogowaniu):
    - Użytkownik widzi spersonalizowany dashboard z:
      - Najnowszymi artykułami z wybranych kategorii
      - Opcją zmiany preferencji
-     - Linkiem do archiwum wcześniejszych newsletterów
-
+   
+     
 3. Przeglądanie kategorii:
    - Użytkownik może kliknąć na daną kategorię, aby zobaczyć więcej artykułów z tej dziedziny.
    - Na stronie kategorii wyświetlane są tytuły, krótkie streszczenia i linki do pełnych artykułów.
@@ -24,7 +24,7 @@ Ogolna idea
    - Kliknięcie w tytuł artykułu przenosi użytkownika do strony z pełnym streszczeniem.
    - Na tej stronie jest też link do oryginalnego artykułu.
 
-5. Generowanie i wysyłanie newslettera:
+5. Generowanie i wysyłanie newslettera dla subskrebentow:
    - System automatycznie generuje newslettery zgodnie z preferencjami użytkowników.
    - Newsletter zawiera:
      - Personalizowane powitanie
@@ -32,7 +32,7 @@ Ogolna idea
      - Opcję przejścia do pełnej wersji na stronie
 
 6. Otrzymywanie newslettera:
-   - Użytkownik otrzymuje e-mail z newsletterem zgodnie z wybraną częstotliwością.
+   - Użytkownik otrzymuje e-mail z newsletterem zgodnie z informacja z formularza.
    - E-mail zawiera krótkie streszczenia i linki do pełnych artykułów na stronie.
 
 7. Interakcja z newsletterem:
@@ -42,14 +42,11 @@ Ogolna idea
 8. Panel ustawień użytkownika:
    - Użytkownik może w każdej chwili zmienić swoje preferencje:
      - Dodać lub usunąć kategorie
-     - Zmienić częstotliwość otrzymywania newslettera
-     - Zaktualizować adres e-mail
+   
 
 9. Funkcje dodatkowe:
    - Wyszukiwarka artykułów na stronie
-   - Możliwość zapisania artykułów do przeczytania później
-   - System rekomendacji artykułów na podstawie historii czytania
-
+  
 Implementacja:
 
 1. Frontend (strona internetowa):
@@ -105,3 +102,9 @@ Subskrypcje (Subscription):
 Główne zmiany i ich wpływ:
 
 Kategoria jest teraz bezpośrednio powiązana z artykułem, co upraszcza zapytania i strukturę danych.
+
+Użytkownicy mogą przeglądać artykuły i kategorie.
+Zalogowani użytkownicy mogą aktualizować swoje preferencje dotyczące kategorii.
+Subskrypcja newslettera jest zarządzana przez news_api, a nie bezpośrednio przez model User.
+Użytkownicy mogą generować PDF-y z artykułami dla wybranych kategorii.
+Istnieje możliwość wyszukiwania artykułów.

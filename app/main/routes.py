@@ -1,10 +1,13 @@
 from flask import render_template, flash, redirect, url_for, request, current_app, send_file
 from flask_login import current_user, login_required
+
+from Newsletter_database import news_api
 from app import db
 from app.main import bp
-from app.forms import UpdatePreferencesForm
-from app.models import Article, Category, Summary
+from app.forms import UpdatePreferencesForm, SubscriptionForm
 from mining_summary.spiders.generatePDF import PDF
+from app.models import Article, Category, Summary, User
+import json
 
 @bp.route('/')
 @bp.route('/index')
@@ -17,19 +20,6 @@ def category(category_name):
     category = Category.query.filter_by(name=category_name).first_or_404()
     articles = Article.query.filter_by(category=category).order_by(Article.created_at.desc()).all()
     return render_template('category.html', title=category.name, category=category.name, articles=articles)
-
-@bp.route('/profile', methods=['GET', 'POST'])
-@login_required
-def profile():
-    form = UpdatePreferencesForm()
-    if form.validate_on_submit():
-        current_user.update_preferences(form.preferences.data)
-        db.session.commit()
-        flash('Your preferences have been updated.', 'success')
-        return redirect(url_for('main.profile'))
-    elif request.method == 'GET':
-        form.preferences.data = current_user.get_preferences()
-    return render_template('user_profile.html', title='Profile', form=form)
 
 @bp.route('/generate_newsletter')
 @login_required
@@ -60,31 +50,50 @@ def article(id):
     article = Article.query.get_or_404(id)
     return render_template('article.html', article=article, title=article.title)
 
+@bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = UpdatePreferencesForm()
+    if form.validate_on_submit():
+        current_user.update_preferences(form.preferences.data)
+        db.session.commit()
+        flash('Your preferences have been updated.', 'success')
+        return redirect(url_for('main.profile'))
+    elif request.method == 'GET':
+        form.preferences.data = current_user.get_preferences()
+    is_subscribed = news_api.is_user_subscribed(current_user.id)
+    return render_template('user_profile.html', title='Profile', form=form, is_subscribed=is_subscribed)
+
+from Newsletter_database.news_api import NewsAPI
+
+news_api = NewsAPI()
+
 @bp.route('/subscribe', methods=['GET', 'POST'])
 def subscribe():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.profile'))
     form = SubscriptionForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            user.preferences = json.dumps({'categories': form.preferences.data})
-            user.subscribe()
+            if news_api.subscribe_user(user.id):
+                flash('You have successfully subscribed to the newsletter.', 'success')
+            else:
+                flash('There was an error subscribing to the newsletter.', 'error')
         else:
-            user = User(email=form.email.data, preferences=json.dumps({'categories': form.preferences.data}))
-            user.set_password('temporary_password')  # Możesz zaimplementować system resetowania hasła
-            user.subscribe()
-            db.session.add(user)
-        db.session.commit()
-        flash('You have been subscribed to the newsletter!', 'success')
+            flash('Email not found. Please register first.', 'error')
         return redirect(url_for('main.index'))
-    return render_template('subscribe.html', form=form)
+    return render_template('subscribe.html', title='Subscribe', form=form)
 
 @bp.route('/unsubscribe')
 @login_required
 def unsubscribe():
-    current_user.unsubscribe()
-    db.session.commit()
-    flash('You have been unsubscribed from the newsletter.', 'info')
+    if news_api.unsubscribe_user(current_user.id):
+        flash('You have been unsubscribed from the newsletter.', 'info')
+    else:
+        flash('There was an error unsubscribing from the newsletter.', 'error')
     return redirect(url_for('main.profile'))
+
 
 @bp.route('/latest_articles')
 def latest_articles():
@@ -106,3 +115,12 @@ def generate_pdf(category_name):
     else:
         flash('Unable to generate PDF for this category', 'error')
         return redirect(url_for('main.pdfs'))
+
+@bp.app_errorhandler(404)
+def not_found_error(error):
+    return render_template('errors/404.html'), 404
+
+@bp.app_errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('errors/500.html'), 500

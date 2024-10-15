@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) UNIQUE,
     password_hash VARCHAR(255),
     preferences JSON,
+    is_subscribed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -47,3 +48,4 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE INDEX idx_article_link ON article(link);
 CREATE INDEX idx_article_category ON article(category_id);
 CREATE INDEX idx_user_email ON users(email);
+CREATE INDEX idx_user_subscribed ON users(is_subscribed);
