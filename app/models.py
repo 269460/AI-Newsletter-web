@@ -45,7 +45,6 @@ class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
-    frequency = db.Column(db.Enum('daily', 'weekly', 'monthly'), default='weekly')
     user = db.relationship('User', backref=db.backref('subscriptions', lazy=True))
     category = db.relationship('Category', backref=db.backref('subscriptions', lazy=True))
 

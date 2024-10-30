@@ -23,7 +23,7 @@ class NewsAPI:
             print("Connected to MySQL database")
             return connection
         except Error as e:
-            print(f"Error connecting to MySQL database: {e}")
+            self.logger.error(f"Error connecting to MySQL database: {e}")
             return None
 
     def subscribe_user(self, user_id):
@@ -82,6 +82,83 @@ class NewsAPI:
             return cursor.fetchall()
         except Error as e:
             print(f"Error fetching articles for categories {categories}: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def article_exists(self, url):
+        cursor = self.connection.cursor()
+        query = "SELECT COUNT(*) FROM article WHERE link = %s"
+        try:
+            cursor.execute(query, (url,))
+            count = cursor.fetchone()[0]
+            return count > 0
+        except Error as e:
+            print(f"Error checking article existence: {e}")
+            return False
+        finally:
+            cursor.close()
+
+    def save_article(self, link, title, scrapy_text, source, category):
+        cursor = self.connection.cursor()
+        try:
+            self.connection.start_transaction()
+
+            # Zapisz lub pobierz kategorię
+            cat_query = "INSERT IGNORE INTO categories (name) VALUES (%s)"
+            cursor.execute(cat_query, (category,))
+
+            cat_id_query = "SELECT id FROM categories WHERE name = %s"
+            cursor.execute(cat_id_query, (category,))
+            category_id = cursor.fetchone()[0]
+
+            # Zapisz artykuł
+            article_query = """
+            INSERT INTO article (link, title, scrapy_text, source, category_id, created_at)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+            """
+            cursor.execute(article_query, (link, title, scrapy_text, source, category_id))
+            article_id = cursor.lastrowid
+
+            self.connection.commit()
+            return article_id
+
+        except Error as e:
+            self.logger.error(f"Error saving article: {e}")
+            self.connection.rollback()
+            return None
+        finally:
+            cursor.close()
+
+    def save_summary(self, article_id, summary_text, reader_type):
+        cursor = self.connection.cursor()
+        try:
+            query = """
+            INSERT INTO summaries (article_id, summary, reader_type, created_at)
+            VALUES (%s, %s, %s, NOW())
+            """
+            cursor.execute(query, (article_id, summary_text, reader_type))
+            self.connection.commit()
+            return True
+        except Error as e:
+            self.logger.error(f"Error saving summary: {e}")
+            return False
+        finally:
+            cursor.close()
+
+    def get_article_summaries(self, article_id):
+        cursor = self.connection.cursor(dictionary=True)
+        try:
+            query = """
+            SELECT summary, reader_type, created_at
+            FROM summaries
+            WHERE article_id = %s
+            ORDER BY created_at DESC
+            """
+            cursor.execute(query, (article_id,))
+            return cursor.fetchall()
+        except Error as e:
+            self.logger.error(f"Error fetching summaries: {e}")
             return []
         finally:
             cursor.close()

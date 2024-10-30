@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS newsletter;
 USE newsletter;
 
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE IF NOT EXISTS category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) UNIQUE,
     description TEXT
@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     category_id INT,
-    frequency ENUM('daily', 'weekly', 'monthly') DEFAULT 'weekly',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
     UNIQUE KEY (user_id, category_id)

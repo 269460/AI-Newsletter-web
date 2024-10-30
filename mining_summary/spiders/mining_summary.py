@@ -240,6 +240,7 @@ from mining_summary.spiders.model import generate_summary
 import logging
 import os
 
+
 class MiningSpider(scrapy.Spider):
     name = "mining_summary"
 
@@ -253,7 +254,7 @@ class MiningSpider(scrapy.Spider):
 
     def load_summary_instructions(self):
         try:
-            with open('config/typeofreaders.txt', 'r', encoding='utf-8') as file:
+            with open("config/typeofreaders.txt", "r", encoding="utf-8") as file:
                 return file.read()
         except FileNotFoundError:
             self.logger.error("Plik 'typeofreaders.txt' nie znaleziony.")
@@ -266,7 +267,9 @@ class MiningSpider(scrapy.Spider):
         # Rozpoczęcie procesu scrapowania dla nowych artykułów
         new_articles = self.article_finder.find_new_articles()
         for article in new_articles:
-            yield scrapy.Request(article['link'], self.parse, meta={'source': article['source']})
+            yield scrapy.Request(
+                article["link"], self.parse, meta={"source": article["source"]}
+            )
 
     def parse(self, response):
         """Przetwarza odpowiedź i zapisuje artykuł do bazy danych"""
@@ -275,40 +278,109 @@ class MiningSpider(scrapy.Spider):
             self.logger.error(f"Nie udało się wyekstrahować treści z: {response.url}")
             return
 
-        cleaned_content = clean_text(content)
-        summary = generate_summary(self.summary_instructions + "\n\n" + cleaned_content)
-        category = self.categorize_tech_article(cleaned_content)
-
         try:
+            # Sprawdzenie czy artykuł już istnieje
             if not self.news_api.article_exists(response.url):
+                cleaned_content = clean_text(content)
+                category = self.categorize_tech_article(cleaned_content)
+
+                # Zapisz artykuł i otrzymaj jego ID
                 article_id = self.news_api.save_article(
                     link=response.url,
-                    title=response.css('title::text').get(),
+                    title=response.css("title::text").get(),
                     scrapy_text=cleaned_content,
-                    source=response.meta['source'],
-                    category=category
+                    source=response.meta["source"],
+                    category=category,
                 )
+
                 if article_id:
-                    self.logger.info(f"Artykuł i streszczenie zapisane: {response.url}")
+                    # Generuj i zapisz streszczenia dla różnych typów czytelników
+                    reader_types = [
+                        "AI",
+                        "IoT",
+                        "CS",
+                        "RA",
+                        "TC",
+                        "TM",
+                        "BT",
+                        "NT",
+                        "EO",
+                        "TK",
+                    ]
+
+                    for reader_type in reader_types:
+                        # Generuj spersonalizowane streszczenie dla danego typu czytelnika
+                        summary_prompt = f"{self.summary_instructions}\nReader Type: {reader_type}\n\n{cleaned_content}"
+                        summary = generate_summary(summary_prompt)
+
+                        # Jeśli streszczenie zostało wygenerowane i nie jest "not enough info"
+                        if summary and summary != "not enough info":
+                            # Zapisz streszczenie
+                            self.news_api.save_summary(article_id, summary, reader_type)
+
+                    self.logger.info(f"Artykuł i streszczenia zapisane: {response.url}")
                 else:
                     self.logger.error(f"Nie udało się zapisać artykułu: {response.url}")
             else:
                 self.logger.info(f"Artykuł już istnieje: {response.url}")
+
         except Exception as e:
-            self.logger.error(f"Błąd podczas przetwarzania artykułu {response.url}: {str(e)}")
+            self.logger.error(
+                f"Błąd podczas przetwarzania artykułu {response.url}: {str(e)}"
+            )
 
     def categorize_tech_article(self, content):
         categories = {
-            'AI': ['sztuczna inteligencja', 'uczenie maszynowe', 'deep learning', 'AI', 'machine learning'],
-            'IoT': ['internet rzeczy', 'IoT', 'połączone urządzenia', 'smart home', 'inteligentne miasta'],
-            'CS': ['cyberbezpieczeństwo', 'bezpieczeństwo cyfrowe', 'hacking', 'ochrona danych', 'kryptografia'],
-            'RA': ['robotyka', 'automatyzacja', 'robot', 'coboty', 'RPA'],
-            'TC': ['chmura', 'cloud computing', 'edge computing', 'fog computing', 'centrum danych'],
-            'TM': ['5G', '6G', 'smartfon', 'aplikacje mobilne', 'technologie mobilne'],
-            'BT': ['biotechnologia', 'inżynieria genetyczna', 'CRISPR', 'terapia genowa', 'bioczujniki'],
-            'NT': ['nanotechnologia', 'nanomateriały', 'nanoroboty', 'nanostruktury'],
-            'EO': ['energia odnawialna', 'fotowoltaika', 'energia wiatrowa', 'magazynowanie energii'],
-            'TK': ['komputer kwantowy', 'kryptografia kwantowa', 'czujniki kwantowe', 'internet kwantowy']
+            "AI": [
+                "sztuczna inteligencja",
+                "uczenie maszynowe",
+                "deep learning",
+                "AI",
+                "machine learning",
+            ],
+            "IoT": [
+                "internet rzeczy",
+                "IoT",
+                "połączone urządzenia",
+                "smart home",
+                "inteligentne miasta",
+            ],
+            "CS": [
+                "cyberbezpieczeństwo",
+                "bezpieczeństwo cyfrowe",
+                "hacking",
+                "ochrona danych",
+                "kryptografia",
+            ],
+            "RA": ["robotyka", "automatyzacja", "robot", "coboty", "RPA"],
+            "TC": [
+                "chmura",
+                "cloud computing",
+                "edge computing",
+                "fog computing",
+                "centrum danych",
+            ],
+            "TM": ["5G", "6G", "smartfon", "aplikacje mobilne", "technologie mobilne"],
+            "BT": [
+                "biotechnologia",
+                "inżynieria genetyczna",
+                "CRISPR",
+                "terapia genowa",
+                "bioczujniki",
+            ],
+            "NT": ["nanotechnologia", "nanomateriały", "nanoroboty", "nanostruktury"],
+            "EO": [
+                "energia odnawialna",
+                "fotowoltaika",
+                "energia wiatrowa",
+                "magazynowanie energii",
+            ],
+            "TK": [
+                "komputer kwantowy",
+                "kryptografia kwantowa",
+                "czujniki kwantowe",
+                "internet kwantowy",
+            ],
         }
 
         content_lower = content.lower()
@@ -316,63 +388,67 @@ class MiningSpider(scrapy.Spider):
             if any(keyword in content_lower for keyword in keywords):
                 return category
 
-        return 'OT'  # Other Technology, jeśli nie pasuje do żadnej konkretnej kategorii
-
+        return "OT"  # Other Technology, jeśli nie pasuje do żadnej konkretnej kategorii
 
     def extract_content(self, response):
         # Ekstrakcja treści z różnych źródeł
         url = response.url.lower()
 
         if "bbc.co.uk" in url:
-            return ' '.join(response.css('.article__body-content p::text').getall())
+            return " ".join(response.css(".article__body-content p::text").getall())
         elif "nytimes.com" in url:
-            return ' '.join(response.css('.StoryBodyCompanionColumn p::text').getall())
+            return " ".join(response.css(".StoryBodyCompanionColumn p::text").getall())
         elif "techcrunch.com" in url:
-            return ' '.join(response.css('.article-content p::text').getall())
+            return " ".join(response.css(".article-content p::text").getall())
         elif "theverge.com" in url:
-            return ' '.join(response.css('.c-entry-content p::text').getall())
+            return " ".join(response.css(".c-entry-content p::text").getall())
         elif "wired.com" in url:
-            return ' '.join(response.css('.body__inner-container p::text').getall())
+            return " ".join(response.css(".body__inner-container p::text").getall())
         elif "cnet.com" in url:
-            return ' '.join(response.css('.article-main-body p::text').getall())
+            return " ".join(response.css(".article-main-body p::text").getall())
         elif "arstechnica.com" in url:
-            return ' '.join(response.css('.article-content p::text').getall())
+            return " ".join(response.css(".article-content p::text").getall())
         elif "zdnet.com" in url:
-            return ' '.join(response.css('.article-body p::text').getall())
+            return " ".join(response.css(".article-body p::text").getall())
         elif "engadget.com" in url:
-            return ' '.join(response.css('.article-text p::text').getall())
+            return " ".join(response.css(".article-text p::text").getall())
         elif "technologyreview.com" in url:
-            return ' '.join(response.css('.article-body__content p::text').getall())
+            return " ".join(response.css(".article-body__content p::text").getall())
         elif "computerworld.com" in url:
-            return ' '.join(response.css('.article-body p::text').getall())
+            return " ".join(response.css(".article-body p::text").getall())
         elif "venturebeat.com" in url:
-            return ' '.join(response.css('.article-content p::text').getall())
+            return " ".join(response.css(".article-content p::text").getall())
         elif "gizmodo.com" in url:
-            return ' '.join(response.css('.js_post-content p::text').getall())
+            return " ".join(response.css(".js_post-content p::text").getall())
         elif "digitaltrends.com" in url:
-            return ' '.join(response.css('.article-content p::text').getall())
+            return " ".join(response.css(".article-content p::text").getall())
         elif "techradar.com" in url:
-            return ' '.join(response.css('.article-body p::text').getall())
+            return " ".join(response.css(".article-body p::text").getall())
         # Dla źródeł RSS, które mogą przekierowywać do różnych domen
         elif "rss.slashdot.org" in url or "feeds.feedburner.com" in url:
-            return ' '.join(response.xpath('//p[not(@class)]//text()').getall())
+            return " ".join(response.xpath("//p[not(@class)]//text()").getall())
         # Ogólna metoda dla stron, które nie mają specyficznego selektora
         else:
-            content = ' '.join(response.xpath('//article//p[not(@class) or @class=""]//text()').getall())
+            content = " ".join(
+                response.xpath(
+                    '//article//p[not(@class) or @class=""]//text()'
+                ).getall()
+            )
             if not content:
-                content = ' '.join(response.xpath('//div[@class="content"]//p//text()').getall())
+                content = " ".join(
+                    response.xpath('//div[@class="content"]//p//text()').getall()
+                )
             if not content:
-                content = ' '.join(response.xpath('//p//text()').getall())
+                content = " ".join(response.xpath("//p//text()").getall())
             return content.strip()
+
 
 def run_spider():
     # Uruchomienie spider'a
-    process = CrawlerProcess(settings={
-        'LOG_LEVEL': 'INFO',
-        'LOG_FILE': 'spider.log'
-    })
+    process = CrawlerProcess(settings={"LOG_LEVEL": "INFO", "LOG_FILE": "spider.log"})
     process.crawl(MiningSpider)
     process.start()
+
 
 if __name__ == "__main__":
     run_spider()
